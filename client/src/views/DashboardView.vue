@@ -3,8 +3,29 @@
         <HeaderView/>
         <div class="container izquierda">
 
-            <a class="btn btn-primary" href="/add-project">Agregar proyecto</a>
+            <div class="row">
+                <div class="col-6">
+                    <a class="btn btn-primary" href="/add-project">Agregar proyecto</a>
+                </div>
+                <div class="col-6">
+                    <form>
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" class="form-control" v-model="date_start" placeholder="Fecha inicio (YY-MM-DD)">
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control" v-model="date_end" placeholder="Fecha fin (YY-MM-DD)">
+                            </div>
+                            <div class="col">
+                                <a href="#" class="btn btn-success" v-on:click="filter()">Buscar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
             <br><br>
+
+            
 
 
             <table class="table table-hover">
@@ -49,7 +70,8 @@ export default{
     data(){
         return {
             ListaPoryectos:null,
-            pagina:1
+            date_start:"",
+            date_end:""
         }
     },
     components:{
@@ -89,6 +111,28 @@ export default{
         },
         add_task(id){
             this.$router.push('/create-task/'+id);
+        },
+        filter(){
+            if(this.date_start == "" && this.date_end == ""){
+                alert("Es necesario indicar almenos un campo")
+            }else{
+                let direccion = "http://127.0.0.1:8000/api/project/filter?"
+                if(this.date_start != ""){
+                    direccion += "date_start="+this.date_start
+                }
+                if(this.date_end != ""){
+                    direccion += this.date_start != "" ? "&" : "";
+                    direccion += "date_end="+this.date_end
+                }
+                axios.get(direccion,{
+                    headers:{
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer' + localStorage.getItem("token")
+                    }
+                }).then( data =>{
+                    this.ListaPoryectos = data.data.data;
+                });
+            }
         }
     }
 }

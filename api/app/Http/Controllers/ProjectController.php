@@ -164,10 +164,10 @@ class ProjectController extends Controller
         }else{
             $query = Project::where('user_id', $user->id);
         }
-        if($date_start){
+        if($date_start && $date_start!=""){
             $query->where('date_start', $date_start);
         }
-        if($date_end){
+        if($date_end && $date_end != ""){
             $query->where('date_end', $date_end);
         }
         $projects = $query->get();

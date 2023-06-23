@@ -1,71 +1,60 @@
 <template>
-  <div class="home">
-    <div class="wrapper fadeInDown">
-      <div id="formContent">
-        <!-- Tabs Titles -->
+    <div>
+        <div class="wrapper fadeInDown">
+            <div id="formContent">
+                <!-- Tabs Titles -->
 
-        <!-- Icon -->
-        <div class="fadeIn first">
-          <img src="@/assets/logo.png" id="icon" alt="User Icon" />
+                <!-- Icon -->
+                <div class="fadeIn first">
+                <img src="@/assets/logo.png" id="icon" alt="User Icon" />
+                </div>
+
+            <!-- Login Form -->
+            <form v-on:submit.prevent="register">
+                <input type="text" id="name" class="fadeIn second" name="name" placeholder="Nombre" v-model="name">
+                <input type="text" id="login" class="fadeIn second" name="login" placeholder="Email" v-model="email">
+                <input type="text" id="password" class="fadeIn third" name="login" placeholder="Password" v-model="password">
+                <input type="submit" class="fadeIn fourth" value="Registrarse">
+                <a href="/" class="fadeIn fourth d-inline-block">Iniciar sesion</a>
+            </form>
+
+            </div>
         </div>
-
-       <!-- Login Form -->
-       <form v-on:submit.prevent="login">
-          <input type="text" id="login" class="fadeIn second" name="login" placeholder="Usuario" v-model="usuario">
-          <input type="text" id="password" class="fadeIn third" name="login" placeholder="Password" v-model="password">
-          <input type="submit" class="fadeIn fourth" value="Iniciar Sesion">
-          <a href="/register" class="fadeIn fourth d-inline-block">Registrarse</a>
-        </form>
-
-        <!-- Remind Passowrd -->
-        <div class="alert alert-danger" role="alert" v-if="error">
-            {{error_msg}}
-        </div>
-
-      </div>
     </div>
-  </div>
 </template>
-
 <script>
-// @ is an alias to /src
 import axios from 'axios';
 
 export default {
-  name: 'HomeView',
-  components: {
-  },
-  data(){
-    return {
-      usuario: "",
-      password: "",
-      error: false,
-      error_msg: "",
+    name: 'RegisterView',
+    data(){
+        return {
+            name: "",
+            email: "",
+            password: "",
+        }
+    },
+    methods:{
+        register(){
+            let json = {
+                "name" : this.name,
+                "email" : this.email,
+                "password": this.password
+            };
+            axios.post(`http://127.0.0.1:8000/api/auth/register`, json)
+            .then( data =>{
+                if(data.status == 201){
+                    alert("Usuario creado con exito")
+                    this.$router.push('/');
+                    //  this.$router.push('dashboard');
+                }else{
+                    alert("Error en la solicitud")
+                }
+            })
+        }
     }
-  },
-  methods:{
-    login(){
-        let json = {
-          "email" : this.usuario,
-          "password": this.password
-        };
-        axios.post(`http://127.0.0.1:8000/api/auth/login`, json)
-        .then( data =>{
-          if(data.status == 200){
-            console.log(data);
-             localStorage.token = data.data.access_token
-             this.$router.push('dashboard');
-            //  this.$router.push('dashboard');
-           }else{
-             this.error = true;
-             this.error_msg = data.data.result.error_msg;
-           }
-        })
-    }
-  }
 }
 </script>
-
 <style scoped>
 /* BASIC */
 
