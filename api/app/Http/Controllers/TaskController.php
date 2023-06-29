@@ -14,6 +14,7 @@ class TaskController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
+        $this->authorizeResource(Task::class, 'task');
     }
     /**
      * Display a listing of the resource.
@@ -73,19 +74,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        $user = auth()->user();
-        $admin = false;
-        foreach($user->roles as $rol){
-            $admin = $rol->name == 'admin' ? true : false;
-        }
-        if($admin){
-            return new TaskResource($task);
-        }else{
-            if($task->project->user_id == $user->id){
-                return new TaskResource($task);
-            }
-            return response()->json(['message' => 'Rol user dont have permission to show'], 400);
-        }
+        return new TaskResource($task);
     }
 
     /**
@@ -113,19 +102,7 @@ class TaskController extends Controller
 
     public function update(TaskRequest $request, Task $task)
     {
-        $user = auth()->user();
-        $admin = false;
-        foreach($user->roles as $rol){
-            $admin = $rol->name == 'admin' ? true : false;
-        }
-        if($admin){
-            $this->fillUpdate($request->validated(), $task);
-        }else{
-            if($task->project->user_id != $user->id){
-                return response()->json(['message' => 'Rol user dont have permission to edit'], 400);
-            }
-            $this->fillUpdate($request->validated(), $task);
-        }
+        $this->fillUpdate($request->validated(), $task);
         return new TaskResource($task);
     }
 
@@ -137,19 +114,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        $user = auth()->user();
-        $admin = false;
-        foreach($user->roles as $rol){
-            $admin = $rol->name == 'admin' ? true : false;
-        }
-        if($admin){
-            $task->delete();
-        }else{
-            if($task->project->user_id != $user->id){
-                return response()->json(['message' => 'Rol user dont have permission to delete'], 400);
-            }
-            $task->delete();
-        }
+        $task->delete();
         return response()->json(['message' => 'Task deleted successfully']);
     }
 

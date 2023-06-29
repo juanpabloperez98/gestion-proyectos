@@ -20,6 +20,7 @@ class ProjectController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
+        $this->authorizeResource(Project::class, 'project');
     }
 
     public function index()
@@ -71,19 +72,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $user = auth()->user();
-        $admin = false;
-        foreach($user->roles as $rol){
-            $admin = $rol->name == 'admin' ? true : false;
-        }
-        if($admin){
-            return new ProjectResource($project);
-        }else{
-            if($project->user_id == $user->id){
-                return new ProjectResource($project);
-            }
-            return response()->json(['message' => 'Rol user dont have permission to show'], 400);
-        }
+        return new ProjectResource($project);
     }
 
     /**
@@ -110,19 +99,7 @@ class ProjectController extends Controller
 
     public function update(ProjectRequest $request, Project $project)
     {
-        $user = auth()->user();
-        $admin = false;
-        foreach($user->roles as $rol){
-            $admin = $rol->name == 'admin' ? true : false;
-        }
-        if($admin){
-            $this->fillUpdate($request->validated(), $project);
-        }else{
-            if($project->user_id != $user->id){
-                return response()->json(['message' => 'Rol user dont have permission to edit'], 400);
-            }
-            $this->fillUpdate($request->validated(), $project);
-        }
+        $this->fillUpdate($request->validated(), $project);
         return new ProjectResource($project);
     }
 
@@ -134,19 +111,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $user = auth()->user();
-        $admin = false;
-        foreach($user->roles as $rol){
-            $admin = $rol->name == 'admin' ? true : false;
-        }
-        if($admin){
-            $project->delete();
-        }else{
-            if($project->user_id != $user->id){
-                return response()->json(['message' => 'Rol user dont have permission to delete'], 400);
-            }
-            $project->delete();
-        }
+        $project->delete();
         return response()->json(['message' => 'Project deleted successfully']);
     }
 
